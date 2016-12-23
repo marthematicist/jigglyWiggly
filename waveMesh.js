@@ -1,6 +1,6 @@
 // waveMesh
 // marthematicist - 2016
-var vers = '0.11';
+var vers = '0.13';
 console.log( 'waveMesh: version ' + vers );
 
 
@@ -49,7 +49,7 @@ function setupGlobalVariables() {
   // SIMULATION VARIABLES
   {
     // desired number of nodes
-    desiredNodes = 400;
+    desiredNodes = 200;
     // total mass
     totalMass = desiredNodes*2;
     // simulation area
