@@ -1,7 +1,7 @@
 // waveMesh
 // marthematicist - 2016
-var vers = '0.13';
-console.log( 'waveMesh: version ' + vers );
+var vers = '0.15';
+console.log( 'jigglyWiggly: version ' + vers );
 
 
 // GLOBAL VARIABLES /////////////////////////////////////////
@@ -85,8 +85,11 @@ function setupGlobalVariables() {
   
   // PHYSICS VARIABLES
   {
+    // factor relating simulation time to frame time
+    // frameTime*dtt = simTime
+    dtt = 0.20 / 20;
     // simulation time per frame
-		dt = 1.0 / ( 2 );
+		dt = 0.20;
 		// gravity constant
 		gravityConstant = 1;
 		// gravity smoothing factor (0.4 optimum)
@@ -116,7 +119,7 @@ function setupGlobalVariables() {
   //RECORD-KEEOING VARIABLES
   {
     frameTimer = millis();
-    avgFrameTime = 0;
+    avgFrameTime = 20;
   }
   // GLOBAL OBJECTS
   {
@@ -478,29 +481,12 @@ function setup() {
   // evolve the mesh 1/2 step
   mesh.evolveHalfStep();
   
-  // display beginning text
-	background( 0 , 0 , 0 );
-	textAlign( CENTER );
-	textSize( minRes*0.08 );
-	fill(255);
-	text("JIGGLY-WIGGLY\n-marthematicist-" , 0.5*xRes , 0.5*yRes - 80 );
-	textSize( minRes*0.05 );
-	//text( "A physics simulation with springs" , 0.5*xRes , 0.5*yRes + 70 );
-	//textSize( minRes*0.04 );
-	text( "version " + vers , 0.5*xRes , yRes - 100 );
   startTimer = millis();
 }
 
 // p5 DRAW FUNCTION /////////////////////////////////////////////////////////
 function draw() {
-  // if still in splash display, don't draw anything
-	if( millis() - startTimer < startWaitTime ) {
-		return
-	}
-	if( clearFirstTime ) {
-		background( 0 , 0 , 0 );
-		clearFirstTime = false;
-	}
+  
   
   // if color change time exceeded, change colors
   if( (millis() - colorTimer) > colorWaitTime ) {
@@ -532,15 +518,38 @@ function draw() {
   mesh.drawMesh();
   //mesh.drawNodes();
   
+  // if still in splash display, draw splash over screen
+	if( millis() - startTimer < startWaitTime ) {
+		// display beginning text
+  	background( 0 , 0 , 0 );
+  	textAlign( CENTER );
+  	textSize( minRes*0.08 );
+  	fill(255);
+  	text("JIGGLY-WIGGLY\n-marthematicist-" , 0.5*xRes , 0.5*yRes - 80 );
+  	textSize( minRes*0.05 );
+  	//text( "A physics simulation with springs" , 0.5*xRes , 0.5*yRes + 70 );
+  	//textSize( minRes*0.04 );
+  	text( "version " + vers , 0.5*xRes , yRes - 100 );
+	} else if( clearFirstTime ) {
+	  clearFirstTime = false;
+	  dt = dtt * avgFrameTime;
+    if( dt > 0.75 ) { dt = 0.75; }
+    console.log( 'average frame time:' + avgFrameTime +'   dt=' + dt );
+	}
   
   // update avgFrameTime
-  avgFrameTime = 0.9*avgFrameTime + 0.1*( millis() - frameTimer )
+  avgFrameTime = 0.9*avgFrameTime + 0.1*( millis() - frameTimer );
+  
   // reset frameTimer
   frameTimer = millis();
   
   // log out data periodically
   if( frameCount % 100 === 0 ) {
-    console.log( 'average frame time:' + avgFrameTime );
+    // reset dt
+    dt = dtt * avgFrameTime;
+    if( dt > 0.75 ) { dt = 0.75; }
+    console.log( 'average frame time:' + avgFrameTime +'   dt=' + dt );
+    
   }
   //console.log( mesh.nodes[0].v );
 }
