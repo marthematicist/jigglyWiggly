@@ -1,6 +1,6 @@
 // waveMesh
 // marthematicist - 2016
-var vers = '0.17';
+var vers = '0.18';
 console.log( 'jigglyWiggly: version ' + vers );
 
 
@@ -80,7 +80,7 @@ function setupGlobalVariables() {
 		// node mass
 		massPerNode = totalMass / numNodes;
 		// perturber mass
-    perturberMass = 2*massPerNode;
+    perturberMass = 3*massPerNode;
   }
   
   // PHYSICS VARIABLES
@@ -508,9 +508,7 @@ function draw() {
     moveTimer = millis();
     // turn on the pertueber
     perturberExists = true;
-    mesh.pmass = perturberMass;
   } else {
-    mesh.pmass = 2* perturberMass;
     // if mouse hasn't moved, check if move delay time exceeded
     if( millis() - moveTimer > moveWaitTime ) {
       // if it has, turn off the perturber
