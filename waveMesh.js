@@ -1,6 +1,6 @@
 // waveMesh
 // marthematicist - 2016
-var vers = '0.15';
+var vers = '0.17';
 console.log( 'jigglyWiggly: version ' + vers );
 
 
@@ -19,9 +19,9 @@ function setupGlobalVariables() {
   // DRAW VARIABLES
   {
     // bachground transparency
-    bgAlpha = 5;
+    bgAlpha = 255;
     // background color
-    bgColor = color( 0 , 0 , 0 , bgAlpha );
+    bgColor = color( 255 , 255 , 255 , bgAlpha );
     // node transparency
     nodeAlpha = 255;
     // node color
@@ -31,13 +31,13 @@ function setupGlobalVariables() {
     // mesh transparency
     meshAlpha = 255;
     // mesh color
-    meshColor = color( 0 , 55 , 100 , meshAlpha );
+    meshColor = color( 0 , 0 , 0 , meshAlpha );
     // mesh thickness
-    meshWeight = 0.004*minRes;
+    meshWeight = 0.003*minRes;
     // fill transparency
-    fillAlpha = 255;
+    fillAlpha =255;
     // fill base colors
-    minc = 128;
+    minc = 100;
     maxc = 255;
     fillBaseColor1 = color( random(minc,maxc) , random(minc,maxc) , random(minc,maxc) , fillAlpha );
     fillBaseColor2 = color( 0 , 200 , 255 , fillAlpha );
@@ -80,11 +80,15 @@ function setupGlobalVariables() {
 		// node mass
 		massPerNode = totalMass / numNodes;
 		// perturber mass
-    perturberMass = 4*massPerNode;
+    perturberMass = 2*massPerNode;
   }
   
   // PHYSICS VARIABLES
   {
+    // perturber repulse?
+    perturberRepulse = false;
+    // max perturber force for attract
+    maxPerturberForceAttract = 0.25;
     // factor relating simulation time to frame time
     // frameTime*dtt = simTime
     dtt = 0.20 / 20;
@@ -114,12 +118,23 @@ function setupGlobalVariables() {
 		colorTimer = 0;
 		// time between color changes
 		colorWaitTime = 4000;
+		// time of last cursor move
+		moveTimer = millis();
+		// delay between last move and deactivation of perturber
+		moveWaitTime = 200;
   }
   
   //RECORD-KEEOING VARIABLES
   {
+    // previous values of mouseX, mouseY
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+    // milliseconds to draw a frame
     frameTimer = millis();
+    // rolling averave of frameTimer
     avgFrameTime = 20;
+    // maximum force magnitude from perturber
+    maxfMag = 0;
   }
   // GLOBAL OBJECTS
   {
@@ -487,22 +502,39 @@ function setup() {
 // p5 DRAW FUNCTION /////////////////////////////////////////////////////////
 function draw() {
   
+  // if mouse has moved...
+  if( lastMouseX != mouseX || lastMouseY != mouseY ) {
+    // reset move timer
+    moveTimer = millis();
+    // turn on the pertueber
+    perturberExists = true;
+    mesh.pmass = perturberMass;
+  } else {
+    mesh.pmass = 2* perturberMass;
+    // if mouse hasn't moved, check if move delay time exceeded
+    if( millis() - moveTimer > moveWaitTime ) {
+      // if it has, turn off the perturber
+      perturberExists = false;
+    }
+  }
+  // set lastMouseX and lastMouseY
+  lastMouseX = mouseX;
+  lastMouseY = mouseY;
   
   // if color change time exceeded, change colors
   if( (millis() - colorTimer) > colorWaitTime ) {
+    // set base fill 1 to previous base fill 2
     fillBaseColor1 = color( red(fillBaseColor2) , green(fillBaseColor2) ,
                             blue(fillBaseColor2) , fillAlpha );
+    // set base fill 2 to a random color
     fillBaseColor2 = color( random(minc,maxc) , random(minc,maxc) , random(minc,maxc) , fillAlpha );
+    // reset color timer
     colorTimer = millis();
   }
   
   // set base color
-  var la = (millis() - colorTimer) / colorWaitTime;
-  var fillBaseColor = lerpColor( fillBaseColor1 , fillBaseColor2 , la );
-  
-  // include perturber if mouse is pressed
-  if(mouseIsPressed) { perturberExists = true; }
-  else { perturberExists = true; }
+  var lerpAmt = (millis() - colorTimer) / colorWaitTime;
+  var fillBaseColor = lerpColor( fillBaseColor1 , fillBaseColor2 , lerpAmt );
   
   // set perturber to mouse position
   var p = win2SimVect( createVector( mouseX , mouseY ) );
@@ -512,7 +544,7 @@ function draw() {
   mesh.evolveFullStep( 1 );
   
   // draw background
-  //background( bgColor );
+  background( bgColor );
   // draw nodes and mesh and fill
   mesh.drawMeshFill( fillBaseColor );
   mesh.drawMesh();
