@@ -1,6 +1,6 @@
 // waveMesh
 // marthematicist - 2016
-var vers = '0.19';
+var vers = '0.20';
 console.log( 'jigglyWiggly: version ' + vers );
 
 
@@ -37,10 +37,12 @@ function setupGlobalVariables() {
     // fill transparency
     fillAlpha =255;
     // fill base colors
-    minc = 100;
+    minc = 150;
     maxc = 255;
-    fillBaseColor1 = color( random(minc,maxc) , random(minc,maxc) , random(minc,maxc) , fillAlpha );
-    fillBaseColor2 = color( 0 , 200 , 255 , fillAlpha );
+    minColorDev = 20;
+    fillBaseColor1 = randomColor( minc , maxc , minColorDev , fillAlpha );
+    //fillBaseColor1 = color( random(minc,maxc) , random(minc,maxc) , random(minc,maxc) , fillAlpha );
+    fillBaseColor2 = randomColor( minc , maxc , minColorDev , fillAlpha );
     // fill color random deviation
     minFillLerp = 0.1;
     maxFillLerp = 0.2;
@@ -117,7 +119,7 @@ function setupGlobalVariables() {
 		// time since last color change
 		colorTimer = 0;
 		// time between color changes
-		colorWaitTime = 4000;
+		colorWaitTime = 10000;
 		// time of last cursor move
 		moveTimer = millis();
 		// delay between last move and deactivation of perturber
@@ -159,6 +161,22 @@ function sim2WinVect( a ) {
 function win2SimVect( a ) {
 	return createVector( (a.x - 0.5*xRes)*win2SimFactor ,
 						 (a.y - 0.5*yRes)*win2SimFactor);
+}
+// function to choose a random color
+function randomColor( minCV , maxCV , minDev , alpha ) {
+  var colorAcceptable = false;
+  var r = 0;
+  var g = 0;
+  var b = 0;
+  while( !colorAcceptable ) {
+    r = random( minCV , maxCV );
+    g = random( minCV , maxCV );
+    b = random( minCV , maxCV );
+    var a = (r + g + b)/3;
+    var dev = sqrt( ( (a-r)*(a-r) + (a-g)*(a-g) + (a-b)*(a-b) ) / 3 );
+    if( dev > minDev ) { colorAcceptable = true; }
+  }
+  return color( r , g , b , alpha );
 }
 
 // CLASS: Node /////////////////////////////////////////////////////////////
@@ -529,7 +547,7 @@ function draw() {
     fillBaseColor1 = color( red(fillBaseColor2) , green(fillBaseColor2) ,
                             blue(fillBaseColor2) , fillAlpha );
     // set base fill 2 to a random color
-    fillBaseColor2 = color( random(minc,maxc) , random(minc,maxc) , random(minc,maxc) , fillAlpha );
+    fillBaseColor2 = randomColor( minc , maxc , minColorDev , fillAlpha );
     // reset color timer
     colorTimer = millis();
   }
