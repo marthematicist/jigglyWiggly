@@ -1,6 +1,6 @@
 // waveMesh
 // marthematicist - 2016
-var vers = '0.20';
+var vers = '0.21';
 console.log( 'jigglyWiggly: version ' + vers );
 
 
@@ -123,7 +123,7 @@ function setupGlobalVariables() {
 		// time of last cursor move
 		moveTimer = millis();
 		// delay between last move and deactivation of perturber
-		moveWaitTime = 400;
+		moveWaitTime = 600;
   }
   
   //RECORD-KEEOING VARIABLES
