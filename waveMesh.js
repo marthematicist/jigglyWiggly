@@ -1,6 +1,6 @@
 // waveMesh
 // marthematicist - 2016
-var vers = '0.18';
+var vers = '0.19';
 console.log( 'jigglyWiggly: version ' + vers );
 
 
@@ -121,7 +121,7 @@ function setupGlobalVariables() {
 		// time of last cursor move
 		moveTimer = millis();
 		// delay between last move and deactivation of perturber
-		moveWaitTime = 200;
+		moveWaitTime = 400;
   }
   
   //RECORD-KEEOING VARIABLES
@@ -508,11 +508,15 @@ function draw() {
     moveTimer = millis();
     // turn on the pertueber
     perturberExists = true;
+    mesh.pmass = perturberMass;
   } else {
-    // if mouse hasn't moved, check if move delay time exceeded
-    if( millis() - moveTimer > moveWaitTime ) {
-      // if it has, turn off the perturber
+    // if mouse hasn't moved, decrease perturber mass
+    var t = millis() - moveTimer;
+    if( t > moveWaitTime ) {
+      // if move wait time exceeded, turn off the perturber
       perturberExists = false;
+    } else {
+      mesh.pmass = ( 1 - t/moveWaitTime )*perturberMass;
     }
   }
   // set lastMouseX and lastMouseY
