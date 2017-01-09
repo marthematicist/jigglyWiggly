@@ -82,7 +82,7 @@ function setupGlobalVariables() {
 		// node mass
 		massPerNode = totalMass / numNodes;
 		// perturber mass
-    perturberMass = 3*massPerNode;
+    perturberMass = 2*massPerNode;
   }
   
   // PHYSICS VARIABLES
