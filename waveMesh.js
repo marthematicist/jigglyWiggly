@@ -577,7 +577,7 @@ function draw() {
   	textAlign( CENTER );
   	textSize( minRes*0.08 );
   	fill(255);
-  	text("JIGGLY-WIGGLY\n-marthematicist-" , 0.5*xRes , 0.5*yRes - 80 );
+  	text("JIGGLY-WIGGLY\npoke it.\n-marthematicist-" , 0.5*xRes , 0.5*yRes - 80 );
   	textSize( minRes*0.05 );
   	//text( "A physics simulation with springs" , 0.5*xRes , 0.5*yRes + 70 );
   	//textSize( minRes*0.04 );
